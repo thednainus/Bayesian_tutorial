@@ -1,5 +1,4 @@
-# Examples for Nature Ecology and Evolution manuscript
-# October 2016
+# Prepared October 2016
 
 rm(list=ls())
 # The data are the 12S rRNA alignment of human and orangutang, with 948 base pairs and 
@@ -49,7 +48,8 @@ image(d.v, k.v, -L, las=1, col=heat.colors(50), main="Likelihood",
       xlab="distance, d", ylab="kappa, k", cex.main=2.0, cex.lab=1.5, cex.axis=1.5)
 contour(d.v, k.v, L, nlev=10, drawlab=FALSE, add=TRUE)
 
-# Posterior surface (unscaled), f(d) * f(k) * f(D|d,k)
+# The (un-normalised) posterior surface is the prior times the posterior, 
+# f(d) * f(k) * f(D|d,k)
 Pos <- Pri * L
 image(d.v, k.v, -Pos, las=1, col=heat.colors(50), main="Posterior", 
       xlab="distance, d", ylab="kappa, k", cex.main=2.0, cex.lab=1.5, cex.axis=1.5)
