@@ -1,7 +1,5 @@
 # Bayesian MCMC phylogenetics tutorial in R
 
-This tutorial is composed of three parts:
-
 This tutorial guides the user through writing a simple MCMC phylogenetics 
 program to estimate the molecular distance and the transition/trasversion
 for a pairwise sequence alignment under Jukes and Cantor (1969) and Kimura's (1980) substitution
