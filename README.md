@@ -3,8 +3,9 @@
 This tutorial guides the user through writing a simple MCMC phylogenetics 
 program to estimate the molecular distance and the transition/trasversion
 for a pairwise sequence alignment under Jukes and Cantor (1969) and Kimura's (1980) substitution
-model. The tutorial introduces concepts such as burn-in, mixing and 
-convergence of the MCMC, efficiency and autocorrelation, and MCMC
-diagnostics.
+model. The tutorial introduces concepts such as burn-in, mixing,  
+convergence, efficiency and autocorrelation of the MCMC chain.
 
-We also provide the solution for exercise 7 included in the JC.R tutorial.
+The tutorial has an accompanying website at:
+
+https://thednainus.wordpress.com/2017/03/03/tutorial-bayesian-mcmc-phylogenetics-using-r/
