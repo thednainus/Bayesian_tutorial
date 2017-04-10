@@ -197,7 +197,8 @@ eff(acf(dk.mcmc2$d)) # [1] 0.2255753 # mcmcf(0.2, 20, 1e7, .12, 180)
 eff(acf(dk.mcmc2$k)) # [1] 0.2015054 # mcmcf(0.2, 20, 1e7, .12, 180)
 
 
-#To illustrate inefficient chains, we will run our MCMC again by using a proposal density #with a too large step size for d, and another with a too small step size for k.
+#To illustrate inefficient chains, we will run our MCMC again by using a proposal density
+#with a too large step size for d, and another with a too small step size for k.
 
 # The window width for the d proposal density is too large,
 # while it is too small for k
