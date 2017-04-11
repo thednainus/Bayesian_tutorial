@@ -6,6 +6,8 @@ for a pairwise sequence alignment under Jukes and Cantor (1969) and Kimura's (19
 model. The tutorial introduces concepts such as burn-in, mixing,  
 convergence, efficiency and autocorrelation of the MCMC chain.
 
-The tutorial has an accompanying website at:
+File `K80.R` has the main R code for the tutorial. An accompanying website, explaining the code in detail can be found at:
 
 https://thednainus.wordpress.com/2017/03/03/tutorial-bayesian-mcmc-phylogenetics-using-r/
+
+This repository contains two additional files  
