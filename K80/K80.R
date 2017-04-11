@@ -1,3 +1,4 @@
+# Clean up your R space
 rm(list=ls())
 
 #######################
@@ -32,11 +33,12 @@ k80.lnL <- function(d, k, n=948, ns=84, nv=6) {
 # function that returns the logarithm of the unscaled posterior, f(d) * f(k) * f(D|d,k)
 # by default we set the priors as f(d) = Gamma(d | 2, 20) and f(k) = Gamma(k | 2, .1)
 ulnP <- function(d, k, n=948, ns=84, nv=6,
-                 a.d=2, b.d=20, a.k=2, b.k=.1)
+                 a.d=2, b.d=20, a.k=2, b.k=.1) {
  
  return (dgamma(d, a.d, b.d, log=TRUE) +
         dgamma(k, a.k, b.k, log=TRUE) +
         k80.lnL(d, k, n, ns, nv))
+}
         
 
 dim <- 100  # dimension for the plot
@@ -45,7 +47,6 @@ k.v <- seq(from=0, to=100, len=dim) # vector of k values
 dk <- expand.grid(d=d.v, k=k.v)
  
 par(mfrow=c(1, 3))
-
 
 # Prior surface, f(D)f(k)
 Pri <- matrix(dgamma(dk$d, 2, 20) * dgamma(dk$k, 2, .1),
@@ -72,7 +73,7 @@ image(d.v, k.v, -L, las=1, col=heat.colors(50),
  
 contour(d.v, k.v, L, nlev=10,
         drawlab=FALSE, add=TRUE) # creates a contour plot
- # Unscaled posterior surface, f(d)f(k)f(D|d,k)
+# Unscaled posterior surface, f(d)f(k)f(D|d,k)
 Pos <- Pri * L
  
 image(d.v, k.v, -Pos, las=1, col=heat.colors(50),
@@ -108,34 +109,49 @@ mcmcf <- function(init.d, init.k, N, w.d, w.k) {
   # w.d is the 'width' of the proposal density for d.
   # w.k is the 'width' of the proposal density for k.
  
-  # keep the visited values of d and k.
+  # here we keep the visited states of d and k.
   d <- k <- numeric(N+1)
-  d[1] <- init.d
-  k[1] <- init.k
+  # initialise the MCMC chain
+  dnow <- d[1] <- init.d
+  know <- k[1] <- init.k
+  ulnPnow <- ulnP(dnow, know)
   acc.d <- acc.k <- 0 # number of acceptances
  
   for (i in 1:N) {
     # we use uniform densities with reflection
     # to propose new d* and k* states
- 
     # propose and accept/reject new d
-    d.prop <- abs(d[i] + runif(1, -w.d/2, w.d/2))
-    lnalpha <- ulnP(d.prop, k[i]) - ulnP(d[i], k[i])
+    dnew <- dnow + runif(1, -w.d/2, w.d/2)
+    # reflect if dnew is negative
+    if (dnew < 0) dnew <- -dnew
+    
+    ulnPnew <- ulnP(dnew, know)
+    lnalpha <- ulnPnew - ulnPnow
     # if ru < alpha accept proposed d*:
     if (lnalpha > 0 || runif(1, 0, 1) < exp(lnalpha)) {
-      d[i+1] <- d.prop; acc.d  <- acc.d + 1
+      dnow <- dnew; ulnPnow <- ulnPnew; 
+      acc.d  <- acc.d + 1
     }
     # else reject it:
-    else d[i+1] <- d[i]
-        # propose and accept/reject new k
-    k.prop <- abs(k[i] + runif(1, -w.k/2, w.k/2))
-    lnalpha <- ulnP(d[i], k.prop) - ulnP(d[i], k[i])
+    else dnew <- dnow
+        
+    # propose and accept/reject new k
+    knew <- know + runif(1, -w.k/2, w.k/2)
+    # reflect if knew is negative
+    if (knew < 0) knew <- -knew
+    
+    ulnPnew <- ulnP(dnew, knew)
+    lnalpha <- ulnPnew - ulnPnow
     # if ru < alpha accept proposed k*:
     if (lnalpha > 0 || runif(1, 0, 1) < exp(lnalpha)) {
-      k[i+1] <- k.prop; acc.k  <- acc.k + 1
+      know <- knew; ulnPnow <- ulnPnew
+      acc.k  <- acc.k + 1
     }
     # else reject it:
-    else k[i+1] <- k[i]
+    else knew <- know
+    
+    # save chain state:
+    d[i+1] <- dnew; k[i+1] <- knew
   }
  
   # print out the proportion of times
@@ -148,12 +164,11 @@ mcmcf <- function(init.d, init.k, N, w.d, w.k) {
 }
 
 # Test run-time:
-system.time(mcmcf(0.2, 20, 1e4, .12, 180)) # about 0.7s
+system.time(mcmcf(0.2, 20, 1e4, .12, 180)) # about 0.4s
 # Run again and save MCMC output:
 dk.mcmc <- mcmcf(0.2, 20, 1e4, .12, 180) 
 
 par(mfrow=c(1,3))
- 
 # trace plot of d
 plot(dk.mcmc$d, ty='l', xlab="Iteration", ylab="d", main="Trace of d")
 # trace plot of k
@@ -177,11 +192,8 @@ plot(dk.mcmc$d, dk.mcmc$k, pch='.', xlab="d", ylab="k", main="Joint of d and k")
 # eff = 1 / (1 + 2(r1 + r2 + r3 + ...))
 # where ri is the correlation for lag i.
 
-# run a very long chain (1e6 generations take about 1.2min in my MacBook Air)
-# to calculate efficiency
-
 # run a very long chain (1e6 generations take about
-# 1.2min in my MacBook Air) to calculate efficiency
+# 40s in my MacBook Air) to calculate efficiency
 dk.mcmc2 <- mcmcf(0.2, 20, 1e6, .12, 180)
  
 # R's acf function (for AutoCorrelation Function) 
