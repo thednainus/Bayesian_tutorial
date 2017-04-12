@@ -86,7 +86,7 @@ contour(d.v, k.v, Pos, nlev=10,
 # f(d) * f(k) * f(D|d,k)
 # by default we set the priors as: 
 # f(d) = Gamma(d | 2, 20) and f(k) = Gamma(k | 2, .1)
-ulnP <- function(d, k, n=948, ns=84, nv=6, a.d=2, b.d=20, a.k=2, b.k=.1) {
+ulnPf <- function(d, k, n=948, ns=84, nv=6, a.d=2, b.d=20, a.k=2, b.k=.1) {
   # The normalizing constant in the prior densities can be ignored:
   lnpriord <- (a.d - 1)*log(d) - b.d * d
   lnpriork <- (a.k - 1)*log(k) - b.k * k
@@ -115,62 +115,64 @@ ulnP <- function(d, k, n=948, ns=84, nv=6, a.d=2, b.d=20, a.k=2, b.k=.1) {
 
 mcmcf <- function(init.d, init.k, N, w.d, w.k) {
   # init.d and init.k are the initial states
-  # N is the number of 'generations' the algorithm is run for.
-  # w.d is the 'width' of the proposal density for d.
-  # w.k is the 'width' of the proposal density for k.
- 
-  # here we keep the visited states of d and k.
-  d <- k <- numeric(N+1)
+  # N is the number of MCMC iterations.
+  # w.d is the width of the sliding-window proposal for d.
+  # w.k is the width of the sliding-window proposal for k.
+  
+  # We keep the visited states (d, k) in sample.d and sample.k 
+  # for easy plotting. In practical MCMC applications, these 
+  # are usually written into a file.
+  sample.d <- sample.k <- numeric(N+1)
   # initialise the MCMC chain
-  dnow <- d[1] <- init.d
-  know <- k[1] <- init.k
-  ulnPnow <- ulnP(dnow, know)
-  acc.d <- acc.k <- 0 # number of acceptances
- 
+  d <- init.d;  sample.d[1] <- init.d
+  k <- init.k;  sample.k[1] <- init.k
+  ulnP <- ulnPf(d, k)
+  acc.d <- 0;  acc.k <- 0 # number of acceptances
+  
   for (i in 1:N) {
-    # we use uniform densities with reflection
-    # to propose new d* and k* states
-    # propose and accept/reject new d
-    dnew <- dnow + runif(1, -w.d/2, w.d/2)
-    # reflect if dnew is negative
-    if (dnew < 0) dnew <- -dnew
+    # we use a uniform sliding window of width w with reflection
+    # to propose new values d* and k* 
+    # propose d* and accept/reject the proposal
+    dprop <- d + runif(1, -w.d/2, w.d/2)
+    # reflect if dprop is negative
+    if (dprop < 0) dprop <- -dprop
     
-    ulnPnew <- ulnP(dnew, know)
-    lnalpha <- ulnPnew - ulnPnow
+    ulnPprop <- ulnPf(dprop, k)
+    lnalpha <- ulnPprop - ulnP
     # if ru < alpha accept proposed d*:
-    if (lnalpha > 0 || runif(1, 0, 1) < exp(lnalpha)) {
-      dnow <- dnew; ulnPnow <- ulnPnew; 
+    if (lnalpha > 0 || runif(1) < exp(lnalpha)){
+      d <- dprop;  ulnP <- ulnPprop; 
       acc.d  <- acc.d + 1
     }
-    # else reject it:
-    else dnew <- dnow
-        
-    # propose and accept/reject new k
-    knew <- know + runif(1, -w.k/2, w.k/2)
-    # reflect if knew is negative
-    if (knew < 0) knew <- -knew
+    # else reject and stay where we are (so that nothing needs 
+    # to be done).
     
-    ulnPnew <- ulnP(dnew, knew)
-    lnalpha <- ulnPnew - ulnPnow
+    # propose k* and accept/reject the proposal
+    kprop <- k + runif(1, -w.k/2, w.k/2)
+    # reflect if kprop is negative
+    if (kprop < 0) kprop <- -kprop
+    
+    ulnPprop <- ulnPf(d, kprop)
+    lnalpha <- ulnPprop - ulnP
     # if ru < alpha accept proposed k*:
-    if (lnalpha > 0 || runif(1, 0, 1) < exp(lnalpha)) {
-      know <- knew; ulnPnow <- ulnPnew
+    if (lnalpha > 0 || runif(1) < exp(lnalpha)){
+      k <- kprop;  ulnP <- ulnPprop
       acc.k  <- acc.k + 1
     }
-    # else reject it:
-    else knew <- know
+    # else reject and stay where we are.
     
     # save chain state:
-    d[i+1] <- dnew; k[i+1] <- knew
+    sample.d[i+1] <- d;  sample.k[i+1] <- k
   }
- 
+  
   # print out the proportion of times
   # the proposals were accepted
   print("Acceptance proportions (d, k):")
   print(c(acc.d/N, acc.k/N))
- 
+  
   # return vector of d and k visited during MCMC
-  return (list(d=d, k=k))
+  
+  return (list(d=sample.d, k=sample.k))
 }
 
 # Test run-time:
@@ -272,7 +274,7 @@ dk.mcmc3.b <- mcmcf(0.05, 5, 1e4, 3, 5)
 
 # plot and compare histograms
 par(mfrow=c(1,2))
-bks <- seq(from=0, to=105, by=1)
+bks <- seq(from=0, to=150, by=1)
  
 hist(dk.mcmc.b$k, prob=TRUE, breaks=bks, border=NA,
      col=rgb(0, 0, 1, .5), las=1, xlab="kappa",
@@ -316,3 +318,4 @@ lines(density(dk.mcmc$k, adj=adj), col="black")
 plot(density(dk.mcmc3.b$k, adj=adj), col="blue", las=1,
      xlim=c(0, 100), ylim=c(0, .05), xaxs="i", yaxs="i")
 lines(density(dk.mcmc3$k, adj=adj), col="black")
+
