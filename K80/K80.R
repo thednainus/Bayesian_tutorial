@@ -30,9 +30,6 @@ k80.lnL <- function(d, k, n=948, ns=84, nv=6) {
         ns * log(p1/4) + nv * log(p2/4))
 }
 
-
-        
-
 dim <- 100  # dimension for the plot
 d.v <- seq(from=0, to=0.3, len=dim) # vector of d values
 k.v <- seq(from=0, to=100, len=dim) # vector of k values
@@ -85,7 +82,7 @@ contour(d.v, k.v, Pos, nlev=10,
 # In most practical problems, constant z cannot be calculated (either
 # analytically or numerically), and so the MCMC algorithm becomes necessary.
 
-# function that returns the logarithm of the unscaled posterior:
+# Function that returns the logarithm of the unscaled posterior:
 # f(d) * f(k) * f(D|d,k)
 # by default we set the priors as: 
 # f(d) = Gamma(d | 2, 20) and f(k) = Gamma(k | 2, .1)
