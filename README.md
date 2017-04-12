@@ -1,5 +1,5 @@
 # Bayesian MCMC phylogenetics tutorial in R
-Fabricia Nascimento, Mario dos Reis and Ziheng Yang
+Fabricia F. Nascimento, Mario dos Reis and Ziheng Yang
 
 This repository containts two tutorials that guide the user through writing simple MCMC phylogenetics software to estimate the molecular distance (and the transition/trasversion ratio) for a pairwise sequence alignment under the Jukes and Cantor (1969) (and Kimura's 1980) substitution model. The tutorials introduce concepts such as burn-in, mixing, convergence, efficiency and autocorrelation of the MCMC chain.
 
@@ -13,7 +13,7 @@ In the K80 tutorial the user will be able to reproduce the plots to appear in ou
 
 ![](K80/surf.png)
 
-And these are the traces for d and k obtained from an MCMC algorithm written to sample from the posteriro surface above:
+And these are the traces for d and k obtained from an MCMC algorithm written to sample from the posterior surface above:
 
 ![](K80/traces.png)
 
