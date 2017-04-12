@@ -5,7 +5,7 @@ This repository containts two tutorials that guide the user through writing simp
 
 Directory `JC69/` contains the MCMC tutorial to calculate the molecular distance under the JC69 model. The directory contains three files. File `mcmc.JCd.R` contains the main R code with exercises. File `mcmc.JCrt.R` contains the solution to exercise 7 in the previous file. File `BayesianMCMC-JC.pdf` contains a more detailed explanation of the theory used in the tutorial.
 
-Directory `K80/` contains the MCMC tutorial to calculate the molecular distance and the ts/tv ratio under the K80 model. The tutorial is similar to the JC69 one, but focusing on a two parameter MCMC instead. File `mcmc.K80.R` contains the main R code. File `BayesianMCMC-K80.pdf` contains a detailed step-by-step explanation of the R code. The pdf file is the same as the webpage at:
+Directory `K80/` contains the MCMC tutorial to calculate the molecular distance and the ts/tv ratio under the K80 model. The tutorial is similar to the JC69 one, but focusing on a two parameter MCMC instead. File `mcmc.K80.R` contains the main R code. A detailed step-by-step explanation of the R code is given at:
 
 https://thednainus.wordpress.com/2017/03/03/tutorial-bayesian-mcmc-phylogenetics-using-r/
 

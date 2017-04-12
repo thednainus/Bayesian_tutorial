@@ -30,15 +30,7 @@ k80.lnL <- function(d, k, n=948, ns=84, nv=6) {
         ns * log(p1/4) + nv * log(p2/4))
 }
 
-# function that returns the logarithm of the unscaled posterior, f(d) * f(k) * f(D|d,k)
-# by default we set the priors as f(d) = Gamma(d | 2, 20) and f(k) = Gamma(k | 2, .1)
-ulnP <- function(d, k, n=948, ns=84, nv=6,
-                 a.d=2, b.d=20, a.k=2, b.k=.1) {
- 
- return (dgamma(d, a.d, b.d, log=TRUE) +
-        dgamma(k, a.k, b.k, log=TRUE) +
-        k80.lnL(d, k, n, ns, nv))
-}
+
         
 
 dim <- 100  # dimension for the plot
@@ -92,6 +84,27 @@ contour(d.v, k.v, Pos, nlev=10,
 # We now obtain the posterior distribution by MCMC sampling.
 # In most practical problems, constant z cannot be calculated (either
 # analytically or numerically), and so the MCMC algorithm becomes necessary.
+
+# function that returns the logarithm of the unscaled posterior:
+# f(d) * f(k) * f(D|d,k)
+# by default we set the priors as: 
+# f(d) = Gamma(d | 2, 20) and f(k) = Gamma(k | 2, .1)
+ulnP <- function(d, k, n=948, ns=84, nv=6, a.d=2, b.d=20, a.k=2, b.k=.1) {
+  # The normalizing constant in the prior densities can be ignored:
+  lnpriord <- (a.d - 1)*log(d) - b.d * d
+  lnpriork <- (a.k - 1)*log(k) - b.k * k
+  
+  # log-Likelihood:
+  expd1 <- exp(-4*d/(k+2));
+  expd2 <- exp(-2*d*(k+1)/(k+2))
+  p0 <- .25 + .25 * expd1 + .5 * expd2
+  p1 <- .25 + .25 * expd1 - .5 * expd2
+  p2 <- .25 - .25 * expd1
+  lnL <- ((n - ns - nv) * log(p0/4) + ns * log(p1/4) + nv * log(p2/4))
+  
+  # Return unnormalised posterior:
+  return (lnpriord + lnpriork + lnL)
+}
 
 # Draft MCMC algorithm:
 # 1. Set initial states for d and k.
@@ -164,7 +177,7 @@ mcmcf <- function(init.d, init.k, N, w.d, w.k) {
 }
 
 # Test run-time:
-system.time(mcmcf(0.2, 20, 1e4, .12, 180)) # about 0.4s
+system.time(mcmcf(0.2, 20, 1e4, .12, 180)) # about 0.3s
 # Run again and save MCMC output:
 dk.mcmc <- mcmcf(0.2, 20, 1e4, .12, 180) 
 
