@@ -14,9 +14,6 @@ n <- 948 # length of alignment in bp
 ns <- 84 # total number of transitions (23+30+10+21)
 nv <- 6  # total number of transversions (1+0+2+0+2+1+0+0)
  
-V <- nv/n # proportion of transversional differences
-S <- ns/n # proportion of transitional differences
-
 # log-likelihood function, f(D|d,k), using Kimura's (1980) substitution model
 # see p.8 in Yang (2014)
 
@@ -91,7 +88,7 @@ ulnPf <- function(d, k, n=948, ns=84, nv=6, a.d=2, b.d=20, a.k=2, b.k=.1) {
   lnpriord <- (a.d - 1)*log(d) - b.d * d
   lnpriork <- (a.k - 1)*log(k) - b.k * k
   
-  # log-Likelihood:
+  # log-Likelihood (K80 model):
   expd1 <- exp(-4*d/(k+2));
   expd2 <- exp(-2*d*(k+1)/(k+2))
   p0 <- .25 + .25 * expd1 + .5 * expd2
@@ -123,13 +120,15 @@ mcmcf <- function(init.d, init.k, N, w.d, w.k) {
   # for easy plotting. In practical MCMC applications, these 
   # are usually written into a file.
   sample.d <- sample.k <- numeric(N+1)
-  # initialise the MCMC chain
+  
+  # STEP 1: Initialise the MCMC chain
   d <- init.d;  sample.d[1] <- init.d
   k <- init.k;  sample.k[1] <- init.k
   ulnP <- ulnPf(d, k)
   acc.d <- 0;  acc.k <- 0 # number of acceptances
   
   for (i in 1:N) {
+    # STEP 2: Propose new state d*
     # we use a uniform sliding window of width w with reflection
     # to propose new values d* and k* 
     # propose d* and accept/reject the proposal
@@ -139,6 +138,8 @@ mcmcf <- function(init.d, init.k, N, w.d, w.k) {
     
     ulnPprop <- ulnPf(dprop, k)
     lnalpha <- ulnPprop - ulnP
+    
+    # STEP 3: Accept or reject the proposal
     # if ru < alpha accept proposed d*:
     if (lnalpha > 0 || runif(1) < exp(lnalpha)){
       d <- dprop;  ulnP <- ulnPprop; 
@@ -147,6 +148,7 @@ mcmcf <- function(init.d, init.k, N, w.d, w.k) {
     # else reject and stay where we are (so that nothing needs 
     # to be done).
     
+    # STEP 4: Repeat steps 2-3 for k
     # propose k* and accept/reject the proposal
     kprop <- k + runif(1, -w.k/2, w.k/2)
     # reflect if kprop is negative
@@ -161,7 +163,7 @@ mcmcf <- function(init.d, init.k, N, w.d, w.k) {
     }
     # else reject and stay where we are.
     
-    # save chain state:
+    # STEP 5: Save chain state
     sample.d[i+1] <- d;  sample.k[i+1] <- k
   }
   
