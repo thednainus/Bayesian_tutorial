@@ -269,6 +269,28 @@ plot(dk.mcmc3$k, ty='l', las=1, ylim=c(0,100),
 # PART 4: Checking for convergence
 ####################################
 
+# We now illustrate the concept of burn-in
+# We will run a chain with a high starting value,
+# and another with a low starting value.
+dk.mcmc.l <- mcmcf(0.01, 20, 1e4, .12, 180)
+dk.mcmc.h <- mcmcf(0.4, 20, 1e4, .12, 180)
+
+plot(dk.mcmc.l$d, xlim = c(1,200), ylim = c(0,0.4), ty = "l")
+lines(dk.mcmc.h$d, col="red")
+
+# We use the low chain to calculate the mean
+# and sd of d. We could have used the high chain
+# as well.
+mean.d <- mean(dk.mcmc.l$d)
+sd.d <- sd(dk.mcmc.l$d)
+abline(h = mean.d + 2 * c(-sd.d, sd.d), lty = 2)
+# The horizontal dashed lines indicate approximately
+# the 95% CI. Notice how the chains move from either 
+# the high or low starting values towards the
+# stationary phase (the area within the dashed lines).
+# The area before it reaches stationarity is the burn-in.
+
+
 # Efficient chain (good proposal step sizes)
 dk.mcmc.b <- mcmcf(0.05, 5, 1e4, .12, 180)
 # Inefficient chain (bad proposal step sizes)
