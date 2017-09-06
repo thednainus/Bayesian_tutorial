@@ -9,7 +9,7 @@ Directory `K80/` contains the MCMC tutorial to calculate the molecular distance 
 
 https://thednainus.wordpress.com/2017/03/03/tutorial-bayesian-mcmc-phylogenetics-using-r/
 
-In the K80 tutorial the user will be able to reproduce the plots to appear in our forthcoming review on MCMC phylogenetics (details coming soon!). For example, the plot below shows the prior, likelihood and posterior surfaces for the distance, d, and the ts/tv ratio, k, for the K80 example:
+In the K80 tutorial the user will be able to reproduce the plots to appear in our forthcoming review: A biologist's guide to Bayesian phylogenetic analysis, by Nascimento, dos Reis and Yang (2017, Nature Ecology and Evolution, available from the end of September 2017). For example, the plot below shows the prior, likelihood and posterior surfaces for the distance, d, and the ts/tv ratio, k, for the K80 example:
 
 ![](K80/surf.png)
 
