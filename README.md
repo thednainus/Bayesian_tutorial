@@ -11,8 +11,7 @@ https://thednainus.wordpress.com/2017/03/03/tutorial-bayesian-mcmc-phylogenetics
 
 In the K80 tutorial the user will be able to reproduce the plots in our review: 
 
-**A biologist's guide to Bayesian phylogenetic analysis**
-
+**A biologist's guide to Bayesian phylogenetic analysis**  
 Nascimento FF, dos Reis M, Yang Z. (2017) [Nature Ecology and Evolution, 1:1446-1454.](http://rdcu.be/v4jM)
 
 For example, the plot below shows the prior, likelihood and posterior surfaces for the distance, d, and the ts/tv ratio, k, for the K80 example:
